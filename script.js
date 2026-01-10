@@ -51,8 +51,28 @@ document.getElementById("entrega").addEventListener("input", calcularTotal);
 function gerarPDF() {
     const { jsPDF } = window.jspdf;
     const doc = new jsPDF();
+    const logoSelecionada = document.querySelector('input[name="logo"]:checked');
 
     let y = 10;
+    
+    // Logo da loja (no canto superior direito)
+    if (logoSelecionada && logoSelecionada.value) {
+        const img = new Image();
+        img.onload = function() {
+            const tamanho = 20;
+            const x = 180;
+            // Adicionar imagem circular (jsPDF não tem clipping nativo, mas deixamos a imagem quadrada pequena)
+            doc.addImage(img, 'JPEG', x, y, tamanho, tamanho);
+            continuarPDF(doc, y);
+        };
+        img.src = logoSelecionada.value;
+    } else {
+        continuarPDF(doc, y);
+    }
+}
+
+function continuarPDF(doc, y) {
+    y += 3;
     
     // Cabeçalho
     doc.setFontSize(16);
