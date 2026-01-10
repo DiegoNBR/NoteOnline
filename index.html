@@ -1,0 +1,52 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <title>NoteOn - Notas Online</title>
+
+    <!-- jsPDF -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
+
+    <link rel="stylesheet" href="style.css">
+</head>
+<body>
+
+<h1>NoteOn - Notas Online</h1>
+
+<section class="box">
+    <h3>Cliente</h3>
+    <input type="text" id="cliente" placeholder="Nome do cliente">
+</section>
+
+<section class="box">
+    <h3>Produto</h3>
+    <input type="text" id="produto" placeholder="Nome do produto">
+    <input type="number" id="valor" placeholder="Valor unitario">
+    <input type="number" id="quantidade" placeholder="Quantidade">
+    <button onclick="adicionarProduto()">Adicionar</button>
+</section>
+
+<section class="box">
+    <table>
+        <thead>
+            <tr>
+                <th>Produto</th>
+                <th>Valor Unitario</th>
+                <th>Quantidade</th>
+                <th>Total</th>
+            </tr>
+        </thead>
+        <tbody id="listaProdutos"></tbody>
+    </table>
+</section>
+
+<section class="box">
+    <h3>Entrega</h3>
+    <input type="number" id="entrega" placeholder="Valor da entrega">
+    <p class="total">Total: R$ <span id="totalCompra">0.00</span></p>
+    <button class="finalizar" onclick="gerarPDF()">Finalizar Compra</button>
+</section>
+
+<script src="script.js"></script>
+</body>
+</html>
