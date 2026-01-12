@@ -3,28 +3,55 @@
 <head>
     <meta charset="UTF-8">
     <title>NoteOn - Notas Online</title>
+    
+    <!-- Favicon -->
+    <link rel="icon" type="image/svg+xml" href="data:image/svg+xml,<svg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 100 100%22><rect fill=%2260a5fa%22 width=%22100%22 height=%22100%22/><rect fill=%2310b981%22 x=%2225%22 y=%2220%22 width=%2250%22 height=%2260%22 rx=%225%22/><line x1=%2735%22 y1=%2735%22 x2=%2765%22 y2=%2735%22 stroke=%22white%22 stroke-width=%223%22 stroke-linecap=%22round%22/><line x1=%2735%22 y1=%2745%22 x2=%2765%22 y2=%2745%22 stroke=%22white%22 stroke-width=%223%22 stroke-linecap=%22round%22/><line x1=%2735%22 y1=%2755%22 x2=%2765%22 y2=%2755%22 stroke=%22white%22 stroke-width=%223%22 stroke-linecap=%22round%22/><line x1=%2735%22 y1=%2765%22 x2=%2750%22 y2=%2765%22 stroke=%22white%22 stroke-width=%223%22 stroke-linecap=%22round%22/></svg>">
 
     <!-- jsPDF -->
     <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
+    
+    <!-- html2canvas para captura de tela -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
+    
+    <!-- docx para gerar documentos Word -->
+    <script src="https://cdn.jsdelivr.net/npm/docx@8.5.0/build/index.js"></script>
 
     <link rel="stylesheet" href="style.css">
 </head>
 <body>
 
-<h1>NoteOn - Notas Online</h1>
+<div class="header">
+    <div class="header-left">
+        <svg class="note-icon" viewBox="0 0 100 100" xmlns="http://www.w3.org/2000/svg">
+            <rect fill="currentColor" x="25" y="20" width="50" height="60" rx="5"/>
+            <line x1="35" y1="35" x2="65" y2="35" stroke="white" stroke-width="3" stroke-linecap="round"/>
+            <line x1="35" y1="45" x2="65" y2="45" stroke="white" stroke-width="3" stroke-linecap="round"/>
+            <line x1="35" y1="55" x2="65" y2="55" stroke="white" stroke-width="3" stroke-linecap="round"/>
+            <line x1="35" y1="65" x2="50" y2="65" stroke="white" stroke-width="3" stroke-linecap="round"/>
+        </svg>
+        <h1>NoteOn</h1>
+    </div>
+    <button id="themeToggle" class="theme-toggle">🌙</button>
+</div>
 
 <section class="box">
     <h3>Cliente</h3>
     <input type="text" id="cliente" placeholder="Nome do cliente">
+    <input type="tel" id="telefone" placeholder="Telefone (opcional)" maxlength="15">
+    <input type="text" id="cpfCnpj" placeholder="CPF ou CNPJ (opcional)">
 </section>
 
 <section class="box">
     <h3>Logo da Loja</h3>
-    <label>
-        <input type="radio" name="logo" value="img/Pefeito.jpg"> Pefeito
+    <label class="logo-option">
+        <input type="radio" name="logo" value="img/Pefeito.jpg">
+        <img src="img/Pefeito.jpg" alt="Pefeito" class="logo-thumb">
+        <span>Pefeito</span>
     </label>
-    <label>
-        <input type="radio" name="logo" value="img/DModas.jpg"> DModas
+    <label class="logo-option">
+        <input type="radio" name="logo" value="img/DModas.jpg">
+        <img src="img/DModas.jpg" alt="DModas" class="logo-thumb">
+        <span>DModas</span>
     </label>
 </section>
 
@@ -51,12 +78,53 @@
 </section>
 
 <section class="box">
+    <h3>Pagamento</h3>
+    <select id="formaPagamento" placeholder="Forma de pagamento">
+        <option value="">Selecione a forma de pagamento</option>
+        <option value="Boleto">Boleto</option>
+        <option value="Cartão">Cartão</option>
+        <option value="PIX">PIX</option>
+        <option value="Dinheiro">Dinheiro</option>
+        <option value="Cheque">Cheque</option>
+    </select>
+    <label for="dataPagamento" class="date-label">Data de vencimento</label>
+    <input type="date" id="dataPagamento" placeholder="Data de vencimento">
+</section>
+
+<section class="box">
     <h3>Entrega</h3>
     <input type="number" id="entrega" placeholder="Valor da entrega">
     <p class="total">Total: R$ <span id="totalCompra">0.00</span></p>
-    <button class="finalizar" onclick="gerarPDF()">Finalizar Compra</button>
+    
+    <div class="formato-container">
+        <label>Formato de exportação:</label>
+        <div class="formato-buttons">
+            <button class="formato-btn" onclick="gerarPDF()">📄 PDF</button>
+            <button class="formato-btn" onclick="gerarDOCX()">📋 DOCX</button>
+            <button class="formato-btn" onclick="gerarIMG('jpg')">🖼️ JPG</button>
+            <button class="formato-btn" onclick="gerarIMG('png')">🖼️ PNG</button>
+        </div>
+    </div>
+    
+    <button class="finalizar" onclick="finalizarCompra()">Finalizar Compra</button>
 </section>
 
 <script src="script.js"></script>
+<script>
+    const themeToggle = document.getElementById('themeToggle');
+    const html = document.documentElement;
+    
+    const savedTheme = localStorage.getItem('theme') || 'dark';
+    html.setAttribute('data-theme', savedTheme);
+    themeToggle.textContent = savedTheme === 'dark' ? '☀️' : '🌙';
+    
+    themeToggle.addEventListener('click', () => {
+        const currentTheme = html.getAttribute('data-theme');
+        const newTheme = currentTheme === 'dark' ? 'light' : 'dark';
+        html.setAttribute('data-theme', newTheme);
+        localStorage.setItem('theme', newTheme);
+        themeToggle.textContent = newTheme === 'dark' ? '☀️' : '🌙';
+    });
+</script>
 </body>
 </html>
